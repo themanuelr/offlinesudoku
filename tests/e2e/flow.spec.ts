@@ -24,8 +24,10 @@ test('autosaves, resumes after reload, and confirms before replacing a game', as
 });
 
 test('timer runs during play and stops while paused or behind settings', async ({ page }) => {
-  await page.clock.install();
+  // Freeze time so only runFor advances the clock, however slow the machine is.
+  await page.clock.install({ time: new Date('2026-01-01T00:00:00') });
   await page.goto('./');
+  await page.clock.pauseAt(new Date('2026-01-01T00:00:05'));
   await page.getByRole('button', { name: 'Easy' }).click();
   const timer = page.getByTestId('timer');
   await page.clock.runFor(3100);
@@ -42,5 +44,6 @@ test('timer runs during play and stops while paused or behind settings', async (
   await page.getByRole('button', { name: 'Back' }).click();
   await expect(timer).toHaveCount(0);
   await page.getByRole('button', { name: 'Pause' }).click();
+  await page.clock.runFor(50); // let the paused frame render
   await expect(page.locator('.pause-time')).toHaveText('0:03');
 });
