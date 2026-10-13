@@ -135,11 +135,13 @@
 
 .tool {
   position: relative;
+  flex: 1;
+  min-width: 0;
+  max-width: 88px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  min-width: 64px;
   min-height: 56px;
   padding: 6px 4px;
   border-radius: var(--radius-sm);
@@ -231,7 +233,7 @@
 }
 
 /* Tablets and landscape: board left, controls right. */
-@media (orientation: landscape) and (min-width: 640px) {
+@media (orientation: landscape) and (min-aspect-ratio: 5/4) {
   .play {
     --board: min(calc(100dvh - 110px - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 58vw, 720px);
     flex-direction: row;
@@ -241,16 +243,19 @@
   .controls {
     width: min(340px, 34vw);
     min-width: 220px;
-    gap: 20px;
+    height: var(--board);
+    max-height: 560px;
+    gap: 12px;
   }
 
   .numpad {
+    flex: 1;
     grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 8px;
   }
 
   .numpad button {
-    aspect-ratio: 1.1;
     min-height: 0;
     background: var(--surface);
     border: 1px solid var(--line);
@@ -258,6 +263,36 @@
 
   .numpad .digit {
     font-size: 2rem;
+  }
+}
+
+/* Phones in landscape: little height, so tighten the chrome around the board. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .game {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .game .topbar {
+    min-height: 40px;
+    margin-bottom: 4px;
+  }
+
+  .play {
+    --board: min(calc(100dvh - 64px - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 58vw);
+  }
+
+  .board,
+  .controls {
+    min-width: 0;
+  }
+
+  .numpad .digit {
+    font-size: 1.5rem;
+  }
+
+  .tool {
+    min-height: 48px;
   }
 }
 
@@ -293,11 +328,17 @@
   color: var(--text) !important;
 }
 
-.status {
-  margin: -4px 0 8px;
-  text-align: center;
-  font-size: 0.85rem;
+.mistakes {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
   color: var(--text-2);
+}
+
+.mistakes svg {
+  width: 14px;
+  height: 14px;
 }
 
 .cell.flash {

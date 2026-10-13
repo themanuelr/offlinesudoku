@@ -7,7 +7,7 @@ import { settings } from '../../game/settings';
 import { useStore } from '../../game/store';
 import { useT } from '../../i18n';
 import { Board } from '../Board';
-import { IconBack, IconErase, IconGrid, IconHint, IconPause, IconPencil, IconSettings, IconUndo } from '../icons';
+import { IconBack, IconErase, IconGrid, IconHint, IconPause, IconPencil, IconSettings, IconUndo, IconX } from '../icons';
 import { pop, push, reset } from '../nav';
 
 /**
@@ -77,6 +77,12 @@ export function GameScreen() {
           <IconBack />
         </button>
         <h1>{t.difficulty[game.difficulty]}</h1>
+        {showMistakes && (
+          <span class="mistakes" data-testid="mistakes" title={t.mistakes} aria-label={`${t.mistakes}: ${game.mistakes}`}>
+            <IconX />
+            {game.mistakes}
+          </span>
+        )}
         {showTimer && (
           <span class="timer" data-testid="timer">
             {formatTime(game.elapsedMs)}
@@ -89,12 +95,6 @@ export function GameScreen() {
           <IconSettings />
         </button>
       </div>
-
-      {showMistakes && (
-        <p class="status" data-testid="mistakes">
-          {t.mistakes}: {game.mistakes}
-        </p>
-      )}
 
       <div class={`play${paused ? ' is-paused' : ''}`}>
         <Board key={game.givens.join("")} game={game} selected={selected} errors={errors} onSelect={select} />

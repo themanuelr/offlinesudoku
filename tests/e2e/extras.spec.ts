@@ -7,7 +7,7 @@ test('hints solve the puzzle, show the win screen and update stats', async ({ pa
   await page.getByRole('switch', { name: 'Show mistake counter' }).click();
   await page.getByRole('button', { name: 'Back' }).click();
   await page.getByRole('button', { name: 'Easy' }).click();
-  await expect(page.getByTestId('mistakes')).toHaveText('Mistakes: 0');
+  await expect(page.getByTestId('mistakes')).toHaveAttribute('aria-label', 'Mistakes: 0');
 
   const empty = await page.locator('.cell:not(.given)').evaluateAll((els) => els.map((e) => e.getAttribute('data-cell')));
   for (const i of empty) {
