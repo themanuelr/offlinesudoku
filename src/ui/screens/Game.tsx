@@ -1,21 +1,52 @@
 import { useEffect } from 'preact/hooks';
+import { formatTime } from '../../game/format';
 import { errorCells, remaining } from '../../game/game';
-import { enterDigit, eraseSelected, select, session, toggleMode, undoLast } from '../../game/session';
+import { addTime, enterDigit, eraseSelected, select, session, setPaused, toggleMode, undoLast } from '../../game/session';
 import { settings } from '../../game/settings';
 import { useStore } from '../../game/store';
 import { useT } from '../../i18n';
 import { Board } from '../Board';
-import { IconBack, IconErase, IconPencil, IconUndo } from '../icons';
-import { pop } from '../nav';
+import { IconBack, IconErase, IconPause, IconPencil, IconSettings, IconUndo } from '../icons';
+import { pop, push, reset } from '../nav';
+
+/**
+ * Counts play time only while this screen is mounted (no other screen over the board),
+ * the page is visible and the game is not paused.
+ */
+function useClock() {
+  useEffect(() => {
+    let last = performance.now();
+    const tick = () => {
+      const now = performance.now();
+      const dt = now - last;
+      last = now;
+      const s = session.get();
+      if (document.visibilityState === 'visible' && !s.paused && s.game && !s.game.completed) addTime(dt);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') tick();
+      else last = performance.now();
+    };
+    const id = setInterval(tick, 1000);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      tick();
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
+}
 
 export function GameScreen() {
   const t = useT();
-  const { game, selected, mode } = useStore(session);
-  const { errorMode } = useStore(settings);
+  const { game, selected, mode, paused } = useStore(session);
+  const { errorMode, showTimer } = useStore(settings);
+  useClock();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const s = session.get();
+      if (s.paused) return;
       if (e.key >= '1' && e.key <= '9') enterDigit(+e.key);
       else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') eraseSelected();
       else if (e.key === 'n' || e.key === 'p') toggleMode();
@@ -44,9 +75,20 @@ export function GameScreen() {
           <IconBack />
         </button>
         <h1>{t.difficulty[game.difficulty]}</h1>
+        {showTimer && (
+          <span class="timer" data-testid="timer">
+            {formatTime(game.elapsedMs)}
+          </span>
+        )}
+        <button class="icon-btn" aria-label={t.pause} onClick={() => setPaused(true)} disabled={game.completed}>
+          <IconPause />
+        </button>
+        <button class="icon-btn" aria-label={t.settings} onClick={() => push({ name: 'settings' })}>
+          <IconSettings />
+        </button>
       </div>
 
-      <div class="play">
+      <div class={`play${paused ? ' is-paused' : ''}`}>
         <Board game={game} selected={selected} errors={errors} onSelect={select} />
 
         <div class="controls">
@@ -78,6 +120,29 @@ export function GameScreen() {
       </div>
 
       {game.completed && <p class="solved">{t.solved}</p>}
+
+      {paused && (
+        <div class="scrim">
+          <div class="dialog pause" role="dialog" aria-modal="true" aria-label={t.paused}>
+            <h2>{t.paused}</h2>
+            <p class="pause-time">{formatTime(game.elapsedMs)}</p>
+            <div class="dialog-actions">
+              <button class="btn primary" onClick={() => setPaused(false)}>
+                {t.resume}
+              </button>
+              <button
+                class="btn"
+                onClick={() => {
+                  setPaused(false);
+                  reset({ name: 'home' });
+                }}
+              >
+                {t.home}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

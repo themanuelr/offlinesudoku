@@ -1,20 +1,29 @@
 import { useState } from 'preact/hooks';
 import { DIFFICULTIES, type Difficulty } from '../../engine/generator';
-import { startGame } from '../../game/session';
+import { formatTime } from '../../game/format';
+import { inProgress, session, startGame } from '../../game/session';
+import { useStore } from '../../game/store';
 import { useT } from '../../i18n';
+import { Dialog } from '../Dialog';
 import { IconSettings } from '../icons';
 import { push } from '../nav';
 
 export function Home() {
   const t = useT();
+  useStore(session);
+  const saved = inProgress();
   const [busy, setBusy] = useState(false);
+  const [confirm, setConfirm] = useState<Difficulty | null>(null);
+
   const start = async (d: Difficulty) => {
+    setConfirm(null);
     if (busy) return;
     setBusy(true);
     await startGame(d);
     setBusy(false);
     push({ name: 'game' });
   };
+
   return (
     <main class="screen home">
       <div class="topbar">
@@ -29,15 +38,35 @@ export function Home() {
             <span key={i} style={{ animationDelay: `${i * 40}ms` }} />
           ))}
         </div>
-        <p class="muted">{t.chooseDifficulty}</p>
+        {saved && (
+          <button class="btn primary continue" onClick={() => push({ name: 'game' })}>
+            {t.continue}
+            <span>
+              {t.difficulty[saved.difficulty]} · {formatTime(saved.elapsedMs)}
+            </span>
+          </button>
+        )}
+        <p class="muted">{saved ? t.orNewGame : t.chooseDifficulty}</p>
         <div class="difficulties">
           {DIFFICULTIES.map((d) => (
-            <button key={d} class="btn" onClick={() => start(d)} disabled={busy}>
+            <button key={d} class="btn" onClick={() => (saved ? setConfirm(d) : start(d))} disabled={busy}>
               {t.difficulty[d]}
             </button>
           ))}
         </div>
       </div>
+      {confirm && (
+        <Dialog
+          title={t.newGameConfirmTitle}
+          onClose={() => setConfirm(null)}
+          actions={[
+            { label: t.newGameConfirm, onClick: () => start(confirm), primary: true },
+            { label: t.cancel, onClick: () => setConfirm(null) },
+          ]}
+        >
+          <p>{t.newGameConfirmBody}</p>
+        </Dialog>
+      )}
     </main>
   );
 }
