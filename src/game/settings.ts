@@ -1,5 +1,6 @@
 import { createStore } from './store';
 import { load, save } from './storage';
+import type { ErrorMode } from './game';
 
 export type Theme = 'system' | 'light' | 'dark';
 export type Language = 'auto' | 'en' | 'es';
@@ -7,6 +8,7 @@ export type Language = 'auto' | 'en' | 'es';
 export interface Settings {
   theme: Theme;
   language: Language;
+  errorMode: ErrorMode;
 }
 
 export const SETTINGS_KEY = 'sudoku.settings';
@@ -14,12 +16,14 @@ export const SETTINGS_KEY = 'sudoku.settings';
 export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
   language: 'auto',
+  errorMode: 'immediate',
 };
 
 export function normalizeSettings(raw: unknown): Settings {
   const s = { ...DEFAULT_SETTINGS, ...(typeof raw === 'object' && raw ? raw : {}) } as Settings;
   if (!['system', 'light', 'dark'].includes(s.theme)) s.theme = DEFAULT_SETTINGS.theme;
   if (!['auto', 'en', 'es'].includes(s.language)) s.language = DEFAULT_SETTINGS.language;
+  if (!['immediate', 'conflicts', 'off'].includes(s.errorMode)) s.errorMode = DEFAULT_SETTINGS.errorMode;
   return s;
 }
 

@@ -1,3 +1,4 @@
+import type { ErrorMode } from '../../game/game';
 import { settings, updateSettings, type Language, type Theme } from '../../game/settings';
 import { useStore } from '../../game/store';
 import { useT } from '../../i18n';
@@ -53,6 +54,26 @@ export function SettingsScreen() {
               ['auto', t.languageAuto],
               ['en', 'English'],
               ['es', 'Español'],
+            ]}
+          />
+        </div>
+      </div>
+
+      <div class="section-title">{t.game}</div>
+      <div class="list">
+        <div class="list-row stack">
+          <span>
+            {t.errors}
+            <span class="hint">{t.errorsHint}</span>
+          </span>
+          <Segmented<ErrorMode>
+            label={t.errors}
+            value={s.errorMode}
+            onChange={(errorMode) => updateSettings({ errorMode })}
+            options={[
+              ['immediate', t.errorsImmediate],
+              ['conflicts', t.errorsConflicts],
+              ['off', t.errorsOff],
             ]}
           />
         </div>
