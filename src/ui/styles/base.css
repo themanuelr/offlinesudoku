@@ -215,3 +215,10 @@ button:focus-visible {
   color: var(--text-2);
   margin: 24px 0 8px;
 }
+
+@media (max-width: 560px) {
+  .list-row.stack {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

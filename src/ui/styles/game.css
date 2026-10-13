@@ -1,0 +1,273 @@
+.game {
+  padding-bottom: 12px;
+}
+
+.play {
+  --board: min(100%, calc(100dvh - 300px - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 640px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.board {
+  width: var(--board);
+  min-width: 280px;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  container-type: inline-size;
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 6.2cqi;
+  font-variant-numeric: tabular-nums;
+  transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+
+.cell:nth-child(9n) {
+  border-right: none;
+}
+
+.cell:nth-child(n + 73) {
+  border-bottom: none;
+}
+
+.cell.edge-r {
+  border-right: 2px solid var(--line-strong);
+}
+
+.cell.edge-b {
+  border-bottom: 2px solid var(--line-strong);
+}
+
+.cell.related {
+  background: var(--highlight);
+}
+
+.cell.same {
+  background: var(--same);
+}
+
+.cell.selected {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.cell.given {
+  color: var(--given);
+  font-weight: 600;
+}
+
+.cell.entered {
+  color: var(--entered);
+}
+
+.cell.error {
+  color: var(--error);
+}
+
+.cell.error:not(.selected) {
+  background: var(--error-soft);
+}
+
+.value {
+  animation: value-in var(--fast) var(--ease);
+}
+
+@keyframes value-in {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.notes {
+  position: absolute;
+  inset: 6%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  font-size: 2.5cqi;
+  line-height: 1;
+  color: var(--text-2);
+}
+
+.notes span {
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+}
+
+.notes span.hl {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.controls {
+  width: var(--board);
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-around;
+}
+
+.tool {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 64px;
+  min-height: 56px;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--text-2);
+  transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease), opacity var(--fast);
+}
+
+.tool svg {
+  width: 24px;
+  height: 24px;
+}
+
+.tool:active:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.tool:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.tool[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.tool .badge {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  font-style: normal;
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.tool[aria-pressed='true'] .badge {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 4px;
+}
+
+.numpad button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--fast) var(--ease), opacity var(--med) var(--ease), transform var(--fast) var(--ease);
+}
+
+.numpad button:active:not(:disabled) {
+  background: var(--surface-2);
+  transform: scale(0.94);
+}
+
+.numpad .digit {
+  font-size: 1.75rem;
+  color: var(--entered);
+  line-height: 1.1;
+}
+
+.numpad[data-mode='pencil'] .digit {
+  color: var(--text-2);
+}
+
+.numpad .left {
+  font-size: 0.7rem;
+  color: var(--text-2);
+}
+
+.numpad button.done {
+  opacity: 0.25;
+}
+
+.solved {
+  text-align: center;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Tablets and landscape: board left, controls right. */
+@media (orientation: landscape) and (min-width: 640px) {
+  .play {
+    --board: min(calc(100dvh - 110px - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 58vw, 720px);
+    flex-direction: row;
+    gap: clamp(16px, 4vw, 48px);
+  }
+
+  .controls {
+    width: min(340px, 34vw);
+    min-width: 220px;
+    gap: 20px;
+  }
+
+  .numpad {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .numpad button {
+    aspect-ratio: 1.1;
+    min-height: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .numpad .digit {
+    font-size: 2rem;
+  }
+}
+
+/* Tablets in portrait have room to spare: larger controls. */
+@media (orientation: portrait) and (min-width: 700px) {
+  .numpad button {
+    min-height: 72px;
+  }
+
+  .numpad .digit {
+    font-size: 2.2rem;
+  }
+}

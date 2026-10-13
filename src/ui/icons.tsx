@@ -13,3 +13,23 @@ export const IconBack = () => (
     <path d="M15 18l-6-6 6-6" />
   </svg>
 );
+
+export const IconUndo = () => (
+  <svg {...base}>
+    <path d="M9 14L4 9l5-5" />
+    <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+  </svg>
+);
+
+export const IconErase = () => (
+  <svg {...base}>
+    <path d="M20 20H9L4.5 15.5a2 2 0 0 1 0-2.8L13 4.2a2 2 0 0 1 2.8 0l4 4a2 2 0 0 1 0 2.8L12 19" />
+    <path d="M9.5 9.5l5 5" />
+  </svg>
+);
+
+export const IconPencil = () => (
+  <svg {...base}>
+    <path d="M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z" />
+  </svg>
+);
