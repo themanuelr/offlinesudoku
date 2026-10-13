@@ -73,6 +73,10 @@ button:focus-visible {
 
 .topbar h1 {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin: 0;
   font-size: 1.15rem;
   font-weight: 600;
