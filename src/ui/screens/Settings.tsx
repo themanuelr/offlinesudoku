@@ -85,6 +85,35 @@ export function SettingsScreen() {
           <span>{t.showTimer}</span>
           <Toggle label={t.showTimer} checked={s.showTimer} onChange={(showTimer) => updateSettings({ showTimer })} />
         </div>
+        <div class="list-row">
+          <span>{t.showMistakes}</span>
+          <Toggle label={t.showMistakes} checked={s.showMistakes} onChange={(showMistakes) => updateSettings({ showMistakes })} />
+        </div>
+        <div class="list-row">
+          <span>
+            {t.vibrate}
+            <span class="hint">{t.vibrateHint}</span>
+          </span>
+          <Toggle label={t.vibrate} checked={s.vibrate} onChange={(vibrate) => updateSettings({ vibrate })} />
+        </div>
+      </div>
+
+      <div class="section-title">{t.assists}</div>
+      <div class="list">
+        <div class="list-row">
+          <span>
+            {t.hintsSetting}
+            <span class="hint">{t.hintsHint}</span>
+          </span>
+          <Toggle label={t.hintsSetting} checked={s.hints} onChange={(hints) => updateSettings({ hints })} />
+        </div>
+        <div class="list-row">
+          <span>
+            {t.autoNotesSetting}
+            <span class="hint">{t.autoNotesHint}</span>
+          </span>
+          <Toggle label={t.autoNotesSetting} checked={s.autoNotes} onChange={(autoNotes) => updateSettings({ autoNotes })} />
+        </div>
       </div>
 
       <p class="version" data-testid="version">

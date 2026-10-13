@@ -39,3 +39,23 @@ export const IconPause = () => (
     <path d="M9 5v14M15 5v14" />
   </svg>
 );
+
+export const IconHint = () => (
+  <svg {...base}>
+    <path d="M9 18h6M10 21h4" />
+    <path d="M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z" />
+  </svg>
+);
+
+export const IconGrid = () => (
+  <svg {...base}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
+  </svg>
+);
+
+export const IconStats = () => (
+  <svg {...base}>
+    <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+  </svg>
+);

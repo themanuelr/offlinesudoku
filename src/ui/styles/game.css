@@ -292,3 +292,32 @@
   margin: 8px 0 0 !important;
   color: var(--text) !important;
 }
+
+.status {
+  margin: -4px 0 8px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-2);
+}
+
+.cell.flash {
+  animation: unit-done 500ms var(--ease) both;
+}
+
+@keyframes unit-done {
+  40% {
+    background: var(--accent-soft);
+    transform: scale(0.92);
+    border-radius: 6px;
+  }
+}
+
+.win .dialog {
+  text-align: center;
+}
+
+.best {
+  margin-top: 8px !important;
+  color: var(--accent) !important;
+  font-weight: 600;
+}
