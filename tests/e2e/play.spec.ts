@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { solution, wrongDigit } from './helpers';
 
 async function start(page: Page, difficulty = 'Easy') {
   await page.goto('./');
@@ -10,21 +11,31 @@ const emptyCell = (page: Page) => page.locator('.cell:not(.given):not(.entered)'
 
 test('enters pen digits, marks wrong ones red, and undoes', async ({ page }) => {
   await start(page);
-  const cell = emptyCell(page);
-  const index = await cell.getAttribute('data-cell');
+  const index = Number(await emptyCell(page).getAttribute('data-cell'));
   const target = page.locator(`[data-cell="${index}"]`);
+  const wrong = wrongDigit((await solution(page))[index]);
   await target.dispatchEvent('pointerdown');
-  // Find a wrong digit: with immediate errors, a wrong digit turns the cell red.
-  let wrong = 0;
-  for (let d = 1; d <= 9 && !wrong; d++) {
-    await page.locator('.numpad button').nth(d - 1).click();
-    if (await target.evaluate((el) => el.classList.contains('error'))) wrong = d;
-    else await page.getByRole('button', { name: 'Undo' }).click();
-  }
-  expect(wrong).toBeGreaterThan(0);
+  await page.locator('.numpad button').nth(wrong - 1).click();
   await expect(target).toHaveText(String(wrong));
+  await expect(target).toHaveClass(/error/);
   await page.getByRole('button', { name: 'Undo' }).click();
   await expect(target).toHaveText('');
+});
+
+test('a correctly filled cell is locked', async ({ page }) => {
+  await start(page);
+  const index = Number(await emptyCell(page).getAttribute('data-cell'));
+  const target = page.locator(`[data-cell="${index}"]`);
+  const correct = (await solution(page))[index];
+  await target.dispatchEvent('pointerdown');
+  await page.locator('.numpad button').nth(correct - 1).click();
+  await expect(target).toHaveText(String(correct));
+  // Another number, the same number again, erase and undo all leave it in place.
+  await page.locator('.numpad button').nth(wrongDigit(correct) - 1).click();
+  await page.locator('.numpad button').nth(correct - 1).click();
+  await expect(page.getByRole('button', { name: 'Erase' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Undo' })).toBeDisabled();
+  await expect(target).toHaveText(String(correct));
 });
 
 test('pencil marks toggle and the pad shows remaining counts', async ({ page }) => {

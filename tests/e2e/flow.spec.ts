@@ -1,15 +1,16 @@
 import { expect, test } from '@playwright/test';
+import { firstOpenCell, solution, wrongDigit } from './helpers';
 
 test('autosaves, resumes after reload, and confirms before replacing a game', async ({ page }) => {
   await page.goto('./');
   await page.getByRole('button', { name: 'Easy' }).click();
-  const cell = page.locator('.cell:not(.given)').first();
-  const index = await cell.getAttribute('data-cell');
-  await cell.dispatchEvent('pointerdown');
-  await page.locator('.numpad button').nth(0).click();
+  const index = await firstOpenCell(page);
+  const wrong = wrongDigit((await solution(page))[index]);
+  await page.locator(`[data-cell="${index}"]`).dispatchEvent('pointerdown');
+  await page.locator('.numpad button').nth(wrong - 1).click();
   await page.reload();
   await page.getByRole('button', { name: /Continue/ }).click();
-  await expect(page.locator(`[data-cell="${index}"]`)).toHaveText('1');
+  await expect(page.locator(`[data-cell="${index}"]`)).toHaveText(String(wrong));
   // Undo history survives the reload too.
   await expect(page.getByRole('button', { name: 'Undo' })).toBeEnabled();
 
