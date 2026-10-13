@@ -1,0 +1,44 @@
+.home-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.muted {
+  color: var(--text-2);
+  margin: 0;
+}
+
+.logo {
+  display: grid;
+  grid-template-columns: repeat(3, 28px);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.logo span {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--surface-2);
+  animation: pop-in var(--med) var(--ease) both;
+}
+
+.logo span:nth-child(5) {
+  background: var(--accent);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
