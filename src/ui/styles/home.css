@@ -49,3 +49,17 @@
   gap: 10px;
   width: min(100%, 320px);
 }
+
+.btn.continue {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(100%, 320px);
+  min-height: 64px;
+}
+
+.btn.continue span {
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.8;
+}

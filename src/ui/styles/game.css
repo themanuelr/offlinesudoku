@@ -271,3 +271,24 @@
     font-size: 2.2rem;
   }
 }
+
+.timer {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+  margin-right: 4px;
+}
+
+.play.is-paused .board .cell > * {
+  visibility: hidden;
+}
+
+.dialog.pause {
+  text-align: center;
+}
+
+.pause-time {
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 0 !important;
+  color: var(--text) !important;
+}

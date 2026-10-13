@@ -9,6 +9,7 @@ export interface Settings {
   theme: Theme;
   language: Language;
   errorMode: ErrorMode;
+  showTimer: boolean;
 }
 
 export const SETTINGS_KEY = 'sudoku.settings';
@@ -17,12 +18,14 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
   language: 'auto',
   errorMode: 'immediate',
+  showTimer: true,
 };
 
 export function normalizeSettings(raw: unknown): Settings {
   const s = { ...DEFAULT_SETTINGS, ...(typeof raw === 'object' && raw ? raw : {}) } as Settings;
   if (!['system', 'light', 'dark'].includes(s.theme)) s.theme = DEFAULT_SETTINGS.theme;
   if (!['auto', 'en', 'es'].includes(s.language)) s.language = DEFAULT_SETTINGS.language;
+  if (typeof s.showTimer !== 'boolean') s.showTimer = DEFAULT_SETTINGS.showTimer;
   if (!['immediate', 'conflicts', 'off'].includes(s.errorMode)) s.errorMode = DEFAULT_SETTINGS.errorMode;
   return s;
 }

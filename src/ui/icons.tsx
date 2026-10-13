@@ -33,3 +33,9 @@ export const IconPencil = () => (
     <path d="M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z" />
   </svg>
 );
+
+export const IconPause = () => (
+  <svg {...base}>
+    <path d="M9 5v14M15 5v14" />
+  </svg>
+);

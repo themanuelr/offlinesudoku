@@ -17,6 +17,10 @@ function Segmented<T extends string>(props: { value: T; options: [T, string][]; 
   );
 }
 
+export function Toggle(props: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+  return <button class="switch" role="switch" aria-checked={props.checked} aria-label={props.label} onClick={() => props.onChange(!props.checked)} />;
+}
+
 export function SettingsScreen() {
   const t = useT();
   const s = useStore(settings);
@@ -76,6 +80,10 @@ export function SettingsScreen() {
               ['off', t.errorsOff],
             ]}
           />
+        </div>
+        <div class="list-row">
+          <span>{t.showTimer}</span>
+          <Toggle label={t.showTimer} checked={s.showTimer} onChange={(showTimer) => updateSettings({ showTimer })} />
         </div>
       </div>
 
