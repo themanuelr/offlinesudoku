@@ -1,6 +1,6 @@
 import { useEffect } from 'preact/hooks';
 import { formatTime } from '../../game/format';
-import { errorCells, remaining } from '../../game/game';
+import { canUndo, errorCells, isLocked, remaining } from '../../game/game';
 import { addTime, enterDigit, eraseSelected, fillNotes, hintSelected, select, session, setPaused, startGame, toggleMode, undoLast } from '../../game/session';
 import { stats } from '../../game/stats';
 import { settings } from '../../game/settings';
@@ -101,11 +101,11 @@ export function GameScreen() {
 
         <div class="controls">
           <div class="toolbar">
-            <button class="tool" onClick={undoLast} disabled={!game.history.length || game.completed}>
+            <button class="tool" onClick={undoLast} disabled={!canUndo(game)}>
               <IconUndo />
               <span>{t.undo}</span>
             </button>
-            <button class="tool" onClick={eraseSelected} disabled={game.completed}>
+            <button class="tool" onClick={eraseSelected} disabled={game.completed || selected == null || isLocked(game, selected)}>
               <IconErase />
               <span>{t.erase}</span>
             </button>
@@ -121,7 +121,7 @@ export function GameScreen() {
               </button>
             )}
             {hints && (
-              <button class="tool" onClick={hintSelected} disabled={game.completed || selected == null || game.values[selected] === game.solution[selected]}>
+              <button class="tool" onClick={hintSelected} disabled={game.completed || selected == null || isLocked(game, selected)}>
                 <IconHint />
                 <span>{t.hint}</span>
               </button>

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { generate } from '../../src/engine/generator';
 import { bit, PEERS } from '../../src/engine/grid';
-import { autoNotes, erase, errorCells, hint, input, newGame, remaining, undo } from '../../src/game/game';
+import { autoNotes, canUndo, erase, errorCells, hint, input, isLocked, newGame, remaining, undo } from '../../src/game/game';
 
 const fresh = () => newGame(generate('medium', 7));
 const emptyCell = (g: ReturnType<typeof fresh>) => g.givens.findIndex((v) => v === 0);
@@ -17,17 +17,43 @@ describe('game', () => {
     let g = fresh();
     const i = emptyCell(g);
     const d = g.solution[i];
+    const wrong = (d % 9) + 1;
     const peer = PEERS[i].find((p) => !g.givens[p] && g.solution[p] !== d)!;
     g = input(g, peer, d, 'pencil');
     expect(g.notes[peer] & bit(d)).toBeTruthy();
+    g = input(g, i, wrong, 'pen');
     g = input(g, i, d, 'pen');
     expect(g.values[i]).toBe(d);
     expect(g.notes[peer] & bit(d)).toBe(0);
+  });
+
+  it('locks correct cells against input, erase, hints and undo', () => {
+    let g = fresh();
+    const i = emptyCell(g);
+    const d = g.solution[i];
+    const other = g.givens.findIndex((v, k) => v === 0 && k !== i);
+    g = input(g, other, 5, 'pencil');
+    g = input(g, i, d, 'pen');
+    expect(isLocked(g, i)).toBe(true);
+    expect(input(g, i, (d % 9) + 1, 'pen')).toBe(g);
+    expect(input(g, i, d, 'pen')).toBe(g);
+    expect(erase(g, i)).toBe(g);
+    expect(hint(g, i)).toBe(g);
+    // Undo skips the locked placement and takes back the pencil mark before it.
+    expect(canUndo(g)).toBe(true);
+    g = undo(g);
+    expect(g.values[i]).toBe(d);
+    expect(g.notes[other]).toBe(0);
+    expect(g.history).toHaveLength(0);
+    expect(canUndo(g)).toBe(false);
+  });
+
+  it('undo takes back wrong numbers', () => {
+    let g = fresh();
+    const i = emptyCell(g);
+    g = input(g, i, (g.solution[i] % 9) + 1, 'pen');
     g = undo(g);
     expect(g.values[i]).toBe(0);
-    expect(g.notes[peer] & bit(d)).toBeTruthy();
-    g = undo(g);
-    expect(g.notes[peer]).toBe(0);
   });
 
   it('counts mistakes and marks them per error mode', () => {
@@ -45,8 +71,9 @@ describe('game', () => {
   it('same digit again clears the cell; erase clears too', () => {
     let g = fresh();
     const i = emptyCell(g);
-    g = input(g, i, 3, 'pen');
-    g = input(g, i, 3, 'pen');
+    const wrong = (g.solution[i] % 9) + 1;
+    g = input(g, i, wrong, 'pen');
+    g = input(g, i, wrong, 'pen');
     expect(g.values[i]).toBe(0);
     g = input(g, i, 4, 'pencil');
     g = erase(g, i);

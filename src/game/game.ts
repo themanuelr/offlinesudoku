@@ -60,7 +60,10 @@ function commit(g: Game, changes: Map<number, { value: number; notes: number }>,
   return next;
 }
 
-const editable = (g: Game, i: number) => !g.completed && !g.givens[i];
+/** A correctly filled cell is locked, like a given. */
+export const isLocked = (g: Game, i: number) => !!g.givens[i] || (g.values[i] !== 0 && g.values[i] === g.solution[i]);
+
+const editable = (g: Game, i: number) => !g.completed && !isLocked(g, i);
 
 /**
  * Pen: place `d` in cell `i` (same digit again clears it) and remove `d` from pencil
@@ -92,7 +95,7 @@ export function erase(g: Game, i: number): Game {
 
 /** Reveal the correct digit in cell `i`. */
 export function hint(g: Game, i: number): Game {
-  if (!editable(g, i) || g.values[i] === g.solution[i]) return g;
+  if (!editable(g, i)) return g;
   const d = g.solution[i];
   const changes = new Map<number, { value: number; notes: number }>([[i, { value: d, notes: 0 }]]);
   for (const p of PEERS[i]) if (g.notes[p] & bit(d)) changes.set(p, { value: g.values[p], notes: g.notes[p] & ~bit(d) });
@@ -108,16 +111,23 @@ export function autoNotes(g: Game): Game {
   return commit(g, changes);
 }
 
+/** Steps that placed a now-locked number can't be undone, so undo skips past them. */
+const undoable = (g: Game, step: CellSnapshot[]) => !step.some((c) => isLocked(g, c.i));
+
+export const canUndo = (g: Game) => !g.completed && g.history.some((step) => undoable(g, step));
+
 export function undo(g: Game): Game {
-  if (g.completed || !g.history.length) return g;
-  const step = g.history[g.history.length - 1];
+  if (!canUndo(g)) return g;
+  const history = g.history.slice();
+  let step = history.pop()!;
+  while (!undoable(g, step)) step = history.pop()!;
   const values = g.values.slice();
   const notes = g.notes.slice();
   for (const c of step) {
     values[c.i] = c.value;
     notes[c.i] = c.notes;
   }
-  return { ...g, values, notes, history: g.history.slice(0, -1) };
+  return { ...g, values, notes, history };
 }
 
 /** Cells to show in red for the chosen error mode. Givens are never marked. */
