@@ -3,6 +3,8 @@ import type { Difficulty } from '../engine/generator';
 import { autoNotes, erase, hint, input, newGame, undo, type Game, type InputMode } from './game';
 import { createStore } from './store';
 import { load, remove, save } from './storage';
+import { settings } from './settings';
+import { recordHint, recordStart, recordWin } from './stats';
 
 export interface Session {
   game: Game | null;
@@ -34,11 +36,20 @@ export const inProgress = (): Game | null => {
   return g && !g.completed ? g : null;
 };
 
-const setGame = (fn: (g: Game) => Game) =>
-  session.set((s) => (s.game ? { ...s, game: fn(s.game) } : s));
+function setGame(fn: (g: Game) => Game): void {
+  const before = session.get().game;
+  if (!before) return;
+  const after = fn(before);
+  if (after === before) return;
+  session.set((s) => ({ ...s, game: after }));
+  if (after.completed && !before.completed) recordWin(after.difficulty, after.elapsedMs);
+  if (after.hintsUsed > before.hintsUsed) recordHint(after.difficulty);
+  if (after.mistakes > before.mistakes && settings.get().vibrate) navigator.vibrate?.(60);
+}
 
 export async function startGame(difficulty: Difficulty): Promise<void> {
   const puzzle = await takePuzzle(difficulty);
+  recordStart(difficulty, inProgress()?.difficulty ?? null);
   session.set({ game: newGame(puzzle), selected: null, mode: 'pen', paused: false });
 }
 

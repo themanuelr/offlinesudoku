@@ -5,7 +5,7 @@ import { inProgress, session, startGame } from '../../game/session';
 import { useStore } from '../../game/store';
 import { useT } from '../../i18n';
 import { Dialog } from '../Dialog';
-import { IconSettings } from '../icons';
+import { IconSettings, IconStats } from '../icons';
 import { push } from '../nav';
 
 export function Home() {
@@ -28,6 +28,9 @@ export function Home() {
     <main class="screen home">
       <div class="topbar">
         <h1>{t.appName}</h1>
+        <button class="icon-btn" aria-label={t.stats} onClick={() => push({ name: 'stats' })}>
+          <IconStats />
+        </button>
         <button class="icon-btn" aria-label={t.settings} onClick={() => push({ name: 'settings' })}>
           <IconSettings />
         </button>

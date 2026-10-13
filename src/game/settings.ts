@@ -10,6 +10,10 @@ export interface Settings {
   language: Language;
   errorMode: ErrorMode;
   showTimer: boolean;
+  showMistakes: boolean;
+  hints: boolean;
+  autoNotes: boolean;
+  vibrate: boolean;
 }
 
 export const SETTINGS_KEY = 'sudoku.settings';
@@ -19,13 +23,17 @@ export const DEFAULT_SETTINGS: Settings = {
   language: 'auto',
   errorMode: 'immediate',
   showTimer: true,
+  showMistakes: false,
+  hints: false,
+  autoNotes: false,
+  vibrate: false,
 };
 
 export function normalizeSettings(raw: unknown): Settings {
   const s = { ...DEFAULT_SETTINGS, ...(typeof raw === 'object' && raw ? raw : {}) } as Settings;
   if (!['system', 'light', 'dark'].includes(s.theme)) s.theme = DEFAULT_SETTINGS.theme;
   if (!['auto', 'en', 'es'].includes(s.language)) s.language = DEFAULT_SETTINGS.language;
-  if (typeof s.showTimer !== 'boolean') s.showTimer = DEFAULT_SETTINGS.showTimer;
+  for (const k of ['showTimer', 'showMistakes', 'hints', 'autoNotes', 'vibrate'] as const) if (typeof s[k] !== 'boolean') s[k] = DEFAULT_SETTINGS[k];
   if (!['immediate', 'conflicts', 'off'].includes(s.errorMode)) s.errorMode = DEFAULT_SETTINGS.errorMode;
   return s;
 }

@@ -1,6 +1,6 @@
 import { createStore } from '../game/store';
 
-export type Screen = { name: 'home' } | { name: 'settings' } | { name: 'game' };
+export type Screen = { name: 'home' } | { name: 'settings' } | { name: 'game' } | { name: 'stats' };
 
 /** A tiny stack-based navigator. Overlay screens push on top of the current one. */
 export const nav = createStore<Screen[]>([{ name: 'home' }]);

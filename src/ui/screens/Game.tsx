@@ -1,12 +1,13 @@
 import { useEffect } from 'preact/hooks';
 import { formatTime } from '../../game/format';
 import { errorCells, remaining } from '../../game/game';
-import { addTime, enterDigit, eraseSelected, select, session, setPaused, toggleMode, undoLast } from '../../game/session';
+import { addTime, enterDigit, eraseSelected, fillNotes, hintSelected, select, session, setPaused, startGame, toggleMode, undoLast } from '../../game/session';
+import { stats } from '../../game/stats';
 import { settings } from '../../game/settings';
 import { useStore } from '../../game/store';
 import { useT } from '../../i18n';
 import { Board } from '../Board';
-import { IconBack, IconErase, IconPause, IconPencil, IconSettings, IconUndo } from '../icons';
+import { IconBack, IconErase, IconGrid, IconHint, IconPause, IconPencil, IconSettings, IconUndo } from '../icons';
 import { pop, push, reset } from '../nav';
 
 /**
@@ -40,7 +41,8 @@ function useClock() {
 export function GameScreen() {
   const t = useT();
   const { game, selected, mode, paused } = useStore(session);
-  const { errorMode, showTimer } = useStore(settings);
+  const { errorMode, showTimer, showMistakes, hints, autoNotes } = useStore(settings);
+  const allStats = useStore(stats);
   useClock();
 
   useEffect(() => {
@@ -88,8 +90,14 @@ export function GameScreen() {
         </button>
       </div>
 
+      {showMistakes && (
+        <p class="status" data-testid="mistakes">
+          {t.mistakes}: {game.mistakes}
+        </p>
+      )}
+
       <div class={`play${paused ? ' is-paused' : ''}`}>
-        <Board game={game} selected={selected} errors={errors} onSelect={select} />
+        <Board key={game.givens.join("")} game={game} selected={selected} errors={errors} onSelect={select} />
 
         <div class="controls">
           <div class="toolbar">
@@ -106,6 +114,18 @@ export function GameScreen() {
               <span>{t.pencil}</span>
               <em class="badge">{mode === 'pencil' ? t.on : t.off}</em>
             </button>
+            {autoNotes && (
+              <button class="tool" onClick={fillNotes} disabled={game.completed}>
+                <IconGrid />
+                <span>{t.autoNotesBtn}</span>
+              </button>
+            )}
+            {hints && (
+              <button class="tool" onClick={hintSelected} disabled={game.completed || selected == null || game.values[selected] === game.solution[selected]}>
+                <IconHint />
+                <span>{t.hint}</span>
+              </button>
+            )}
           </div>
 
           <div class="numpad" data-mode={mode}>
@@ -119,7 +139,26 @@ export function GameScreen() {
         </div>
       </div>
 
-      {game.completed && <p class="solved">{t.solved}</p>}
+      {game.completed && (
+        <div class="scrim win">
+          <div class="dialog" role="dialog" aria-modal="true" aria-label={t.solved}>
+            <h2>{t.solved}</h2>
+            <p>{t.difficulty[game.difficulty]}</p>
+            <p class="pause-time" data-testid="win-time">
+              {formatTime(game.elapsedMs)}
+            </p>
+            {allStats[game.difficulty].bestMs === game.elapsedMs && allStats[game.difficulty].won > 1 && <p class="best">{t.newBest}</p>}
+            <div class="dialog-actions">
+              <button class="btn primary" onClick={() => void startGame(game.difficulty)}>
+                {t.playAgain}
+              </button>
+              <button class="btn" onClick={() => reset({ name: 'home' })}>
+                {t.home}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {paused && (
         <div class="scrim">
