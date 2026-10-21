@@ -40,6 +40,8 @@ export const es: Strings = {
   showMistakes: 'Mostrar contador de errores',
   vibrate: 'Vibrar al fallar',
   vibrateHint: 'No funciona en iPhone.',
+  multiSelect: 'Notas en varias casillas',
+  multiSelectHint: 'Con Lápiz activado, mantén pulsada una casilla y arrastra para elegir varias; luego toca un número.',
   undo: 'Deshacer',
   erase: 'Borrar',
   pencil: 'Lápiz',

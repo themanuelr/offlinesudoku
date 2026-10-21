@@ -17,6 +17,7 @@ export interface Settings {
   hints: boolean;
   autoNotes: boolean;
   vibrate: boolean;
+  multiSelect: boolean;
 }
 
 export const SETTINGS_KEY = 'sudoku.settings';
@@ -31,6 +32,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hints: false,
   autoNotes: false,
   vibrate: false,
+  multiSelect: false,
 };
 
 export function normalizeSettings(raw: unknown): Settings {
@@ -38,7 +40,7 @@ export function normalizeSettings(raw: unknown): Settings {
   if (!['system', 'light', 'dark'].includes(s.theme)) s.theme = DEFAULT_SETTINGS.theme;
   if (!ACCENTS.includes(s.accent)) s.accent = DEFAULT_SETTINGS.accent;
   if (!['auto', 'en', 'es'].includes(s.language)) s.language = DEFAULT_SETTINGS.language;
-  for (const k of ['showTimer', 'showMistakes', 'hints', 'autoNotes', 'vibrate'] as const) if (typeof s[k] !== 'boolean') s[k] = DEFAULT_SETTINGS[k];
+  for (const k of ['showTimer', 'showMistakes', 'hints', 'autoNotes', 'vibrate', 'multiSelect'] as const) if (typeof s[k] !== 'boolean') s[k] = DEFAULT_SETTINGS[k];
   if (!['immediate', 'conflicts', 'off'].includes(s.errorMode)) s.errorMode = DEFAULT_SETTINGS.errorMode;
   return s;
 }

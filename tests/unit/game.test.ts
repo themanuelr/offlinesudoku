@@ -1,12 +1,36 @@
 import { describe, expect, it } from 'vitest';
 import { generate } from '../../src/engine/generator';
 import { bit, PEERS } from '../../src/engine/grid';
-import { autoNotes, canUndo, erase, errorCells, hint, input, isLocked, newGame, remaining, undo } from '../../src/game/game';
+import { autoNotes, canUndo, erase, eraseNotes, errorCells, hint, input, isLocked, newGame, pencilMany, remaining, undo } from '../../src/game/game';
 
 const fresh = () => newGame(generate('medium', 7));
 const emptyCell = (g: ReturnType<typeof fresh>) => g.givens.findIndex((v) => v === 0);
 
 describe('game', () => {
+  it('pencil marks several cells at once as one undo step', () => {
+    let g = fresh();
+    const open = g.givens.map((v, i) => (v ? -1 : i)).filter((i) => i >= 0);
+    const [a, b, c] = open;
+    const given = g.givens.findIndex((v) => v !== 0);
+    g = input(g, a, 3, 'pencil');
+    // Not all have 3 yet, so it is added to all; the given is skipped.
+    g = pencilMany(g, [a, b, c, given], 3);
+    for (const i of [a, b, c]) expect(g.notes[i] & bit(3)).toBeTruthy();
+    expect(g.notes[given]).toBe(0);
+    // All have it now, so it is removed from all.
+    let h = pencilMany(g, [a, b, c], 3);
+    for (const i of [a, b, c]) expect(h.notes[i] & bit(3)).toBe(0);
+    h = undo(h);
+    for (const i of [a, b, c]) expect(h.notes[i] & bit(3)).toBeTruthy();
+    expect(undo(h).notes[a]).toBe(bit(3));
+    expect(undo(h).notes[b]).toBe(0);
+    // Erase clears every picked cell's marks in one step.
+    h = eraseNotes(h, [a, b]);
+    expect([h.notes[a], h.notes[b], h.notes[c]]).toEqual([0, 0, bit(3)]);
+    expect(undo(h).notes[a]).toBe(bit(3));
+    expect(pencilMany(g, [given], 3)).toBe(g);
+  });
+
   it('ignores input on givens', () => {
     const g = fresh();
     const given = g.givens.findIndex((v) => v !== 0);

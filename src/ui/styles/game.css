@@ -26,6 +26,12 @@
   container-type: inline-size;
 }
 
+.board.can-multi {
+  /* Dragging across cells selects them instead of scrolling or zooming. */
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+
 .cell {
   position: relative;
   display: grid;

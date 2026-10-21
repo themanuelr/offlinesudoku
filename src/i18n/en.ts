@@ -38,6 +38,8 @@ export const en = {
   showMistakes: 'Show mistake counter',
   vibrate: 'Vibrate on mistakes',
   vibrateHint: 'Not supported on iPhone.',
+  multiSelect: 'Pencil marks in several cells',
+  multiSelectHint: 'With Pencil on, hold a cell and drag to select several, then pick a number.',
   undo: 'Undo',
   erase: 'Erase',
   pencil: 'Pencil',

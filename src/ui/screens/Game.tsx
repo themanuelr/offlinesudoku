@@ -1,7 +1,7 @@
 import { useEffect } from 'preact/hooks';
 import { formatTime } from '../../game/format';
 import { canUndo, errorCells, isLocked, remaining } from '../../game/game';
-import { addTime, enterDigit, eraseSelected, fillNotes, hintSelected, select, session, setPaused, startGame, toggleMode, undoLast } from '../../game/session';
+import { addTime, clearMulti, enterDigit, eraseSelected, fillNotes, hintSelected, select, session, setPaused, startGame, toggleMode, undoLast } from '../../game/session';
 import { stats } from '../../game/stats';
 import { settings } from '../../game/settings';
 import { useStore } from '../../game/store';
@@ -40,8 +40,8 @@ function useClock() {
 
 export function GameScreen() {
   const t = useT();
-  const { game, selected, mode, paused } = useStore(session);
-  const { errorMode, showTimer, showMistakes, hints, autoNotes } = useStore(settings);
+  const { game, selected, multi, mode, paused } = useStore(session);
+  const { errorMode, showTimer, showMistakes, hints, autoNotes, multiSelect } = useStore(settings);
   const allStats = useStore(stats);
   useClock();
 
@@ -71,7 +71,13 @@ export function GameScreen() {
   const errors = errorCells(game, errorMode);
 
   return (
-    <main class="screen game">
+    <main
+      class="screen game"
+      onPointerDownCapture={(e) => {
+        // Tapping anywhere but the board, the number pad or Erase drops a multi-selection.
+        if (!(e.target as Element).closest('.board, [data-keep-multi]')) clearMulti();
+      }}
+    >
       <div class="topbar">
         <button class="icon-btn" aria-label={t.back} onClick={pop}>
           <IconBack />
@@ -97,7 +103,15 @@ export function GameScreen() {
       </div>
 
       <div class={`play${paused ? ' is-paused' : ''}`}>
-        <Board key={game.givens.join("")} game={game} selected={selected} errors={errors} onSelect={select} />
+        <Board
+          key={game.givens.join('')}
+          game={game}
+          selected={selected}
+          multi={multi}
+          canMulti={multiSelect && mode === 'pencil' && !game.completed}
+          errors={errors}
+          onSelect={select}
+        />
 
         <div class="controls">
           <div class="toolbar">
@@ -105,7 +119,12 @@ export function GameScreen() {
               <IconUndo />
               <span>{t.undo}</span>
             </button>
-            <button class="tool" onClick={eraseSelected} disabled={game.completed || selected == null || isLocked(game, selected)}>
+            <button
+              class="tool"
+              data-keep-multi
+              onClick={eraseSelected}
+              disabled={game.completed || (!multi.length && (selected == null || isLocked(game, selected)))}
+            >
               <IconErase />
               <span>{t.erase}</span>
             </button>
@@ -128,7 +147,7 @@ export function GameScreen() {
             )}
           </div>
 
-          <div class="numpad" data-mode={mode}>
+          <div class="numpad" data-mode={mode} data-keep-multi>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
               <button key={d} class={left[d] <= 0 ? 'done' : ''} onClick={() => enterDigit(d)} disabled={game.completed} aria-label={`${d}`}>
                 <span class="digit">{d}</span>
