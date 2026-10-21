@@ -284,3 +284,34 @@ button:focus-visible {
     transform: translateY(8px) scale(0.98);
   }
 }
+
+.swatches {
+  display: flex;
+  gap: 10px;
+}
+
+.swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--sw);
+  background-clip: content-box;
+  padding: 3px;
+  transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+
+.swatch:active {
+  transform: scale(0.92);
+}
+
+.swatch[aria-checked='true'] {
+  border-color: var(--sw);
+}
+
+/* Swatches always show the light-mode accent so the choices read the same in both themes. */
+.swatch[data-swatch='blue'] { --sw: #3563e9; }
+.swatch[data-swatch='orange'] { --sw: #c25e12; }
+.swatch[data-swatch='rose'] { --sw: #c8407e; }
+.swatch[data-swatch='green'] { --sw: #2a8253; }
+.swatch[data-swatch='lavender'] { --sw: #7b5cd6; }

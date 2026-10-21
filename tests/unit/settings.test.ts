@@ -7,9 +7,9 @@ describe('normalizeSettings', () => {
     expect(normalizeSettings(null)).toEqual(DEFAULT_SETTINGS);
   });
   it('rejects unknown values', () => {
-    expect(normalizeSettings({ theme: 'pink', language: 'fr' })).toEqual(DEFAULT_SETTINGS);
+    expect(normalizeSettings({ theme: 'pink', language: 'fr', accent: 'teal' })).toEqual(DEFAULT_SETTINGS);
   });
   it('keeps valid values', () => {
-    expect(normalizeSettings({ theme: 'dark', language: 'es' })).toMatchObject({ theme: 'dark', language: 'es' });
+    expect(normalizeSettings({ theme: 'dark', language: 'es', accent: 'rose' })).toMatchObject({ theme: 'dark', language: 'es', accent: 'rose' });
   });
 });

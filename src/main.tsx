@@ -2,14 +2,16 @@ import { render } from 'preact';
 import { registerSW } from 'virtual:pwa-register';
 import { App } from './ui/App';
 import { prepareAll } from './engine/pool';
-import { applyTheme, settings } from './game/settings';
+import { applyAccent, applyTheme, settings } from './game/settings';
 import './ui/styles/tokens.css';
+import './ui/styles/accents.css';
 import './ui/styles/base.css';
 import './ui/styles/home.css';
 import './ui/styles/game.css';
 import './ui/styles/stats.css';
 
 applyTheme(settings.get().theme);
+applyAccent(settings.get().accent);
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyTheme(settings.get().theme));
 
 registerSW({ immediate: true });
