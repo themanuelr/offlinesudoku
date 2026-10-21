@@ -88,6 +88,27 @@ export function input(g: Game, i: number, d: number, mode: InputMode): Game {
   return commit(g, changes, mistake ? { mistakes: g.mistakes + 1 } : {});
 }
 
+/** Cells that can take pencil marks: empty and not locked. */
+export const canPencil = (g: Game, i: number) => editable(g, i) && !g.values[i];
+
+/**
+ * Toggle the pencil mark `d` across several cells as one undo step: removed from all
+ * of them if every one already has it, otherwise added to all of them.
+ */
+export function pencilMany(g: Game, cells: number[], d: number): Game {
+  const open = cells.filter((i) => canPencil(g, i));
+  if (!open.length) return g;
+  const allHave = open.every((i) => g.notes[i] & bit(d));
+  const changes = new Map<number, { value: number; notes: number }>();
+  for (const i of open) changes.set(i, { value: 0, notes: allHave ? g.notes[i] & ~bit(d) : g.notes[i] | bit(d) });
+  return commit(g, changes);
+}
+
+/** Clear the pencil marks of several cells as one undo step. */
+export function eraseNotes(g: Game, cells: number[]): Game {
+  return commit(g, new Map(cells.filter((i) => canPencil(g, i)).map((i) => [i, { value: 0, notes: 0 }])));
+}
+
 export function erase(g: Game, i: number): Game {
   if (!editable(g, i)) return g;
   return commit(g, new Map([[i, { value: 0, notes: 0 }]]));

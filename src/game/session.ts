@@ -1,6 +1,6 @@
 import { takePuzzle } from '../engine/pool';
 import type { Difficulty } from '../engine/generator';
-import { autoNotes, erase, hint, input, newGame, undo, type Game, type InputMode } from './game';
+import { autoNotes, canPencil, erase, eraseNotes, hint, input, newGame, pencilMany, undo, type Game, type InputMode } from './game';
 import { createStore } from './store';
 import { load, remove, save } from './storage';
 import { settings } from './settings';
@@ -9,6 +9,8 @@ import { recordHint, recordStart, recordWin } from './stats';
 export interface Session {
   game: Game | null;
   selected: number | null;
+  /** Cells picked together for pencil marks (multi-select); empty when not in use. */
+  multi: number[];
   mode: InputMode;
   paused: boolean;
 }
@@ -18,7 +20,7 @@ export const GAME_KEY = 'sudoku.game';
 function restore(): Session {
   const game = load<Game | null>(GAME_KEY, null);
   const ok = game && Array.isArray(game.values) && game.values.length === 81 && !game.completed;
-  return { game: ok ? game : null, selected: null, mode: 'pen', paused: false };
+  return { game: ok ? game : null, selected: null, multi: [], mode: 'pen', paused: false };
 }
 
 let lastSaved: Game | null = null;
@@ -50,7 +52,7 @@ function setGame(fn: (g: Game) => Game): void {
 export async function startGame(difficulty: Difficulty): Promise<void> {
   const puzzle = await takePuzzle(difficulty);
   recordStart(difficulty, inProgress()?.difficulty ?? null);
-  session.set({ game: newGame(puzzle), selected: null, mode: 'pen', paused: false });
+  session.set({ game: newGame(puzzle), selected: null, multi: [], mode: 'pen', paused: false });
 }
 
 export const setPaused = (paused: boolean) => session.set((s) => (s.paused === paused ? s : { ...s, paused }));
@@ -58,17 +60,37 @@ export const setPaused = (paused: boolean) => session.set((s) => (s.paused === p
 /** Add play time. Called by the game screen's clock only while the board is in focus. */
 export const addTime = (ms: number) => setGame((g) => (g.completed ? g : { ...g, elapsedMs: g.elapsedMs + ms }));
 
-export const select = (i: number | null) => session.set((s) => ({ ...s, selected: i }));
-export const toggleMode = () => session.set((s) => ({ ...s, mode: s.mode === 'pen' ? 'pencil' : 'pen' }));
+export const select = (i: number | null) => session.set((s) => ({ ...s, selected: i, multi: [] }));
+export const toggleMode = () => session.set((s) => ({ ...s, mode: s.mode === 'pen' ? 'pencil' : 'pen', multi: [] }));
+
+/** Switch from the single selection to a multi-selection starting at cell `i`. */
+export function startMulti(i: number): void {
+  session.set((s) => ({ ...s, selected: null, multi: [] }));
+  addMulti(i);
+}
+
+export function addMulti(i: number): void {
+  const { game, multi } = session.get();
+  if (game && canPencil(game, i) && !multi.includes(i)) session.set((s) => ({ ...s, multi: [...s.multi, i] }));
+}
+
+export const removeMulti = (i: number) => session.set((s) => ({ ...s, multi: s.multi.filter((c) => c !== i) }));
+export const clearMulti = () => session.set((s) => (s.multi.length ? { ...s, multi: [] } : s));
 
 export function enterDigit(d: number): void {
-  const { selected, mode } = session.get();
-  if (selected != null) setGame((g) => input(g, selected, d, mode));
+  const { selected, multi, mode } = session.get();
+  if (multi.length) {
+    setGame((g) => pencilMany(g, multi, d));
+    clearMulti();
+  } else if (selected != null) setGame((g) => input(g, selected, d, mode));
 }
 
 export function eraseSelected(): void {
-  const { selected } = session.get();
-  if (selected != null) setGame((g) => erase(g, selected));
+  const { selected, multi } = session.get();
+  if (multi.length) {
+    setGame((g) => eraseNotes(g, multi));
+    clearMulti();
+  } else if (selected != null) setGame((g) => erase(g, selected));
 }
 
 export function hintSelected(): void {

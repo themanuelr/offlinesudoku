@@ -113,6 +113,13 @@ export function SettingsScreen() {
           </span>
           <Toggle label={t.vibrate} checked={s.vibrate} onChange={(vibrate) => updateSettings({ vibrate })} />
         </div>
+        <div class="list-row">
+          <span>
+            {t.multiSelect}
+            <span class="hint">{t.multiSelectHint}</span>
+          </span>
+          <Toggle label={t.multiSelect} checked={s.multiSelect} onChange={(multiSelect) => updateSettings({ multiSelect })} />
+        </div>
       </div>
 
       <div class="section-title">{t.assists}</div>
