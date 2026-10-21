@@ -59,6 +59,8 @@ export const es: Strings = {
   themeSystem: 'Sistema',
   themeLight: 'Claro',
   themeDark: 'Oscuro',
+  accent: 'Color de resaltado',
+  accents: { blue: 'Azul', orange: 'Naranja', rose: 'Rosa', green: 'Verde', lavender: 'Lavanda' },
   language: 'Idioma',
   languageAuto: 'Dispositivo',
   version: 'Versión',

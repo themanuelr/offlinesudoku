@@ -1,5 +1,5 @@
 import type { ErrorMode } from '../../game/game';
-import { settings, updateSettings, type Language, type Theme } from '../../game/settings';
+import { ACCENTS, settings, updateSettings, type Language, type Theme } from '../../game/settings';
 import { useStore } from '../../game/store';
 import { useT } from '../../i18n';
 import { IconBack } from '../icons';
@@ -47,6 +47,23 @@ export function SettingsScreen() {
               ['dark', t.themeDark],
             ]}
           />
+        </div>
+        <div class="list-row">
+          <span>{t.accent}</span>
+          <div class="swatches" role="radiogroup" aria-label={t.accent}>
+            {ACCENTS.map((a) => (
+              <button
+                key={a}
+                class="swatch"
+                data-swatch={a}
+                role="radio"
+                aria-checked={s.accent === a}
+                aria-label={t.accents[a]}
+                title={t.accents[a]}
+                onClick={() => updateSettings({ accent: a })}
+              />
+            ))}
+          </div>
         </div>
         <div class="list-row">
           <span>{t.language}</span>

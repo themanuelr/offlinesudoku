@@ -57,6 +57,8 @@ export const en = {
   themeSystem: 'System',
   themeLight: 'Light',
   themeDark: 'Dark',
+  accent: 'Highlight colour',
+  accents: { blue: 'Blue', orange: 'Orange', rose: 'Rose', green: 'Green', lavender: 'Lavender' },
   language: 'Language',
   languageAuto: 'Device',
   version: 'Version',

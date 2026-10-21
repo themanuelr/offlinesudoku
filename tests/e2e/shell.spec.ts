@@ -35,3 +35,18 @@ test('works offline after the first visit', async ({ page, context }) => {
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Sudoku' })).toBeVisible();
 });
+
+test('changes the highlight colour and remembers it', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await expect(page.getByRole('radio', { name: 'Blue' })).toHaveAttribute('aria-checked', 'true');
+  await page.getByRole('radio', { name: 'Orange' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-accent', 'orange');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-accent', 'orange');
+  const accent = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--accent').trim());
+  expect(accent).toBe('#c25e12');
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await page.getByRole('radio', { name: 'Blue' }).click();
+  await expect(page.locator('html')).not.toHaveAttribute('data-accent', /.+/);
+});

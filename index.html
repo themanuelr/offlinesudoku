@@ -12,10 +12,11 @@
     <link rel="apple-touch-icon" href="/offlinesudoku/icons/apple-touch-icon.png" />
     <title>Sudoku</title>
     <script>
-      // Apply the saved theme before first paint to avoid a flash.
+      // Apply the saved theme and highlight colour before first paint to avoid a flash.
       try {
-        var t = JSON.parse(localStorage.getItem('sudoku.settings') || '{}').theme;
-        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+        var s = JSON.parse(localStorage.getItem('sudoku.settings') || '{}');
+        if (s.theme === 'light' || s.theme === 'dark') document.documentElement.dataset.theme = s.theme;
+        if (/^(orange|rose|green|lavender)$/.test(s.accent)) document.documentElement.dataset.accent = s.accent;
       } catch (e) {}
     </script>
   </head>

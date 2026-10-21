@@ -1,0 +1,93 @@
+/* Highlight colours. Blue is the default in tokens.css; each option sets the accent family for light and dark. */
+
+:root[data-accent='orange'] {
+  --accent: #c25e12;
+  --accent-soft: #fdebd9;
+  --same: #f9d6b3;
+  --entered: #c4620f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-accent='orange']:not([data-theme='light']) {
+    --accent: #f0a35e;
+    --accent-soft: #4a3220;
+    --same: #5a3b22;
+    --entered: #f5b075;
+  }
+}
+
+:root[data-theme='dark'][data-accent='orange'] {
+  --accent: #f0a35e;
+  --accent-soft: #4a3220;
+  --same: #5a3b22;
+  --entered: #f5b075;
+}
+
+:root[data-accent='rose'] {
+  --accent: #c8407e;
+  --accent-soft: #fbe3ee;
+  --same: #f5c9dc;
+  --entered: #b8366f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-accent='rose']:not([data-theme='light']) {
+    --accent: #f07fae;
+    --accent-soft: #4a2436;
+    --same: #5a2a40;
+    --entered: #f590bb;
+  }
+}
+
+:root[data-theme='dark'][data-accent='rose'] {
+  --accent: #f07fae;
+  --accent-soft: #4a2436;
+  --same: #5a2a40;
+  --entered: #f590bb;
+}
+
+:root[data-accent='green'] {
+  --accent: #2a8253;
+  --accent-soft: #dcf1e4;
+  --same: #bfe5cd;
+  --entered: #23804e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-accent='green']:not([data-theme='light']) {
+    --accent: #6fcf97;
+    --accent-soft: #1f3d2c;
+    --same: #244a34;
+    --entered: #7fd9a4;
+  }
+}
+
+:root[data-theme='dark'][data-accent='green'] {
+  --accent: #6fcf97;
+  --accent-soft: #1f3d2c;
+  --same: #244a34;
+  --entered: #7fd9a4;
+}
+
+:root[data-accent='lavender'] {
+  --accent: #7b5cd6;
+  --accent-soft: #ebe5fb;
+  --same: #d9cff6;
+  --entered: #6a4cc7;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-accent='lavender']:not([data-theme='light']) {
+    --accent: #a993f5;
+    --accent-soft: #312a55;
+    --same: #3a3166;
+    --entered: #b6a3f7;
+  }
+}
+
+:root[data-theme='dark'][data-accent='lavender'] {
+  --accent: #a993f5;
+  --accent-soft: #312a55;
+  --same: #3a3166;
+  --entered: #b6a3f7;
+}
